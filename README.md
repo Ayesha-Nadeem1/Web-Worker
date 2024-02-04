@@ -33,3 +33,8 @@ This is a web application that demonstrates the use of Web Workers for heavy dat
 
    Additionally, managing the communication between the main thread and Web Workers required careful handling of data exchange. The use of the `postMessage` API facilitated this communication, ensuring seamless coordination between threads.
 
+****---Resources---****
+
+https://web.dev/articles/workers-basics
+
+for the use of 'Inline Workers'
