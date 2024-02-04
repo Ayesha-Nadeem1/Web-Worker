@@ -22,3 +22,14 @@ This is a web application that demonstrates the use of Web Workers for heavy dat
 
    -> Adjust Array Size:
       Modify the `generateRandomArray` function in the script to test with larger or smaller datasets.
+
+****---Summary of Findings---****
+
+   The application demonstrates a noticeable performance improvement when using Web Workers for heavy data processing. By offloading tasks to Web Workers, the main thread remains responsive, providing a smoother user experience. The performance gains are more evident with larger datasets, where parallel execution significantly reduces processing time.
+
+****---Challenges and Solutions---****
+
+   One challenge faced was the need to dynamically create a Web Worker script. This was overcome by generating the Web Worker script content within the main JavaScript file and creating a Blob object to serve as the Web Worker source.
+
+   Additionally, managing the communication between the main thread and Web Workers required careful handling of data exchange. The use of the `postMessage` API facilitated this communication, ensuring seamless coordination between threads.
+
