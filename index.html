@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Processing with Web Workers</title>
+</head>
+<body>
+  <h1>Data Processing with Web Workers</h1>
+  <button onclick="startProcessing()">Start Processing</button>
+  <div id="output"></div>
+
+  <script>
+    function startProcessing() {
+      const dataArray = generateRandomArray(1000000); // Adjust the array size as needed
+
+      // Without Web Workers
+      const startTimeWithoutWorkers = performance.now();
+      const resultWithoutWorkers = processDataWithoutWorkers(dataArray);
+      const endTimeWithoutWorkers = performance.now();
+      const timeWithoutWorkers = endTimeWithoutWorkers - startTimeWithoutWorkers;
+
+      // With Web Workers
+      const startTimeWithWorkers = performance.now();
+      processDataWithWorkers(dataArray, (resultWithWorkers) => {
+        const endTimeWithWorkers = performance.now();
+        const timeWithWorkers = endTimeWithWorkers - startTimeWithWorkers;
+
+        displayResults(timeWithoutWorkers, timeWithWorkers);
+      });
+    }
+
+    function processDataWithoutWorkers(dataArray) {
+      // Perform heavy data processing without Web Workers
+      // Example: Sorting a large array
+      return dataArray.sort((a, b) => a - b);
+    }
+
+    function processDataWithWorkers(dataArray, callback) {
+      // Create a Web Worker
+      const workerCode = `
+        onmessage = function (event) {
+          const dataArray = event.data.dataArray;
+
+          // Perform heavy data processing using Web Workers
+          // Example: Sorting a large array
+          const result = dataArray.sort((a, b) => a - b);
+
+          // Send the result back to the main thread
+          postMessage({ result });
+        };
+      `;
+
+      const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+      const worker = new Worker(URL.createObjectURL(workerBlob));
+
+      // Send data to the worker
+      worker.postMessage({ dataArray });
+
+      // Receive results from the worker
+      worker.onmessage = (event) => {
+        const resultWithWorkers = event.data.result;
+
+        // Terminate the worker
+        worker.terminate();
+
+        // Invoke the callback with the result
+        callback(resultWithWorkers);
+      };
+    }
+
+    function displayResults(timeWithoutWorkers, timeWithWorkers) {
+      const output = document.getElementById('output');
+      output.innerHTML = `
+        <p>Time without Web Workers: ${timeWithoutWorkers.toFixed(2)} milliseconds</p>
+        <p>Time with Web Workers: ${timeWithWorkers.toFixed(2)} milliseconds</p>
+      `;
+    }
+
+    function generateRandomArray(size) {
+      return Array.from({ length: size }, () => Math.random() * 1000);
+    }
+  </script>
+</body>
+</html>
